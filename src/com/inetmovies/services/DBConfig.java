@@ -1,29 +1,37 @@
 package com.inetmovies.services;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
+import com.inetmovies.properties.DBProperties;
 import com.mysql.jdbc.PreparedStatement;
 
 public class DBConfig {
 
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://192.168.1.7/imdb";
-	static final String USER = "insetmovies";
-	static final String PASS = "pass123$";
-
 	static public Connection connection = null;
 
-	public static Connection getConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		if (connection == null) {
-			Class.forName(JDBC_DRIVER).newInstance();
-			connection = DriverManager.getConnection(DB_URL, USER, PASS);
-			System.out.println("Connection created...");
+	public static Connection getConnection()
+			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		DBProperties properties = new DBProperties();
+		Properties prop;
+		try {
+			prop = properties.getPropValues();
+			if (connection == null) {
+				Class.forName(prop.getProperty("JDBC_DRIVER")).newInstance();
+				connection = DriverManager.getConnection(prop.getProperty("DB_URL"), prop.getProperty("USER"),
+						prop.getProperty("PASS"));
+				System.out.println("Connection created...");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 		return connection;
 	}
 
